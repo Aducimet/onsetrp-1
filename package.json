@@ -74,7 +74,8 @@
         "transport/c_busstop.lua",
         "vehicle_radio/client.lua",
         "hud/pinmap/client/main.lua",
-        "vehicle/ragP/client.lua"
+        "vehicle/ragP/client.lua",
+        "shortcuts/client.lua"
     ],
     "files": [
         "hud/speaking/speaking.png",
@@ -150,6 +151,8 @@
         "hud/pinmap/client/web/icons/fishing.png",
         "hud/pinmap/client/web/icons/police.png",
         "hud/pinmap/client/web/fonts/Roboto-Regular.ttf",
-        "hud/pinmap/client/web/fonts/Roboto-Light.ttf"
+        "hud/pinmap/client/web/fonts/Roboto-Light.ttf",
+        "shortcuts/index.html",
+        "shortcuts/main.css"
     ]
 }

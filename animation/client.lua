@@ -3,7 +3,7 @@
 web = nil
 
 function OnPackageStart()
-	web = CreateWebUI(0, 0, 0, 0, 10)
+	web = CreateWebUI(0, 0, 0, 0, 60)
 	LoadWebFile(web, "http://asset/" .. GetPackageName() .. "/animation/web/index.html")
 	SetWebSize(web, 700, 700)
 	SetWebAlignment(web, 0.5, 0.5)
