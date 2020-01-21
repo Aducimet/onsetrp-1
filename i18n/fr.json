@@ -458,5 +458,7 @@
     "VEHICLE_ENGINE_KEY": "Allumer / éteindre le moteur",
     "VEHICLE_TRUNK_KEY": "Ouvrir / fermer le coffre",
     "VEHICLE_HOOD_KEY": "Ouvrir / fermer le capot",
-    "ADMIN_MENU_KEY": "Menu admin"
+    "ADMIN_MENU_KEY": "Menu admin",
+    "search_player_inventory" : "Fouiller la personne",
+    "Search" : "Fouille"
 }

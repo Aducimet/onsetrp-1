@@ -427,5 +427,7 @@
     "process_cancel": "Die Verarbeitung wurde abgebrochen, {1} {2} wurde zerstört",
     "process_not_enough_item": "Sie benötigen hierfür {1} {2}",
     "peach_farm": "Angelplätze",
-    "lumberjack_farm": "Holz der Holzfäller"
+    "lumberjack_farm": "Holz der Holzfäller",
+    "search_player_inventory" : "Search the person",
+    "Search" : "Search"
 }

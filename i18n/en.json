@@ -434,5 +434,7 @@
     "process_cancel": "Treatment canceled, {1} {2} were destroyed",
     "process_not_enough_item": "You need {1} {2} for this",
     "peach_farm": "Peach field",
-    "lumberjack_farm": "Lumberjack's wood"
+    "lumberjack_farm": "Lumberjack's wood",
+    "search_player_inventory" : "Search the person",
+    "Search" : "Search"
 }
