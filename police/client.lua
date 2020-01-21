@@ -17,7 +17,7 @@ end)
 
 AddEvent("OnTranslationReady", function()
     policeNpcMenu = Dialog.create(_("police_menu"), nil, _("start_stop_police") ,_("cancel"))
-    policeMenu = Dialog.create(_("police_menu"), nil, _("handcuff_player"), _("put_player_in_vehicle"), _("remove_player_from_vehicle"), _("remove_all_weapons"),_("give_player_fine"), _("cancel"))
+    policeMenu = Dialog.create(_("police_menu"), nil, _("handcuff_player"), _("put_player_in_vehicle"), _("remove_player_from_vehicle"), _("remove_all_weapons"),_("give_player_fine"), _("search_player_inventory"), _("cancel"))
     
     policeNpcGarageMenu = Dialog.create(_("police_garage_menu"), nil,  _("spawn_despawn_patrol_car"), _("cancel"))
     policeNpcArmoryMenu = Dialog.create(_("police_armory"), nil,  _("get_equipped"), _("cancel"))
@@ -27,7 +27,9 @@ AddEvent("OnTranslationReady", function()
     policeFineMenu = Dialog.create(_("finePolice"), nil, _("give_fine"), _("cancel"))
     Dialog.addTextInput(policeFineMenu, 1, _("amount").." :")
     Dialog.addSelect(policeFineMenu, 1, _("player"), 3)
-    Dialog.addTextInput(policeFineMenu, 1, _("reason").." :")
+	Dialog.addTextInput(policeFineMenu, 1, _("reason").." :")
+	policesearch = Dialog.create(_("search_player_inventory"), nil, _("cancel"))
+	Dialog.addSelect(policesearch, 1, _("Search"), 5)
 end)
 
 AddEvent("OnKeyPress", function( key )
@@ -121,6 +123,9 @@ AddEvent("OnDialogSubmit", function(dialog, button, ...)
 	if button == 5 then
 	    CallRemoteEvent("OpenPoliceFineMenu")
 	end
+	if button == 6 then
+		CallRemoteEvent("OpenInventoryPlayer")
+    end
     end
 
     if dialog == policeFineMenu then
@@ -152,6 +157,11 @@ end)
 AddRemoteEvent("OpenPoliceFineMenu", function(playerNames)
     Dialog.setSelectLabeledOptions(policeFineMenu, 1, 2, playerNames)
     Dialog.show(policeFineMenu)
+end)
+
+AddRemoteEvent("OpenInventoryPlayer", function(items)
+	Dialog.setSelectLabeledOptions(policesearch, 1, 1, items)
+	Dialog.show(policesearch)
 end)
 
 function GetNearestPolice()

@@ -112,6 +112,29 @@ AddRemoteEvent("OpenPoliceFineMenu", function(player)
     end
 end)
 
+AddRemoteEvent("OpenInventoryPlayer", function(player)
+	local x, y, z = GetPlayerLocation(player)
+	local playersIds = GetAllPlayers()
+	local playersNames = {}
+
+	for k,v in pairs(playersIds) do
+	    local _x, _y, _z = GetPlayerLocation(k)
+	    if(GetDistance3D(x, y, z, _x, _y, _z) < 115 and player ~= k and PlayerData[k].job ~= "police") then
+		playersNames[k] = k
+	    end
+	end
+
+	local items = {}
+
+	if PlayerData[playersIds[1]] ~= nil then
+		for k,v in pairs(PlayerData[playersIds[1]].inventory) do
+			items[k] = _(k).."["..v.."]"
+    	end
+		CallRemoteEvent(player, "OpenInventoryPlayer", items)
+	end
+	CallRemoteEvent(player, "MakeNotification", _("no_players_around"), "linear-gradient(to right, #ff5f6d, #ffc371)")
+end)
+
 function GetNearestPolice(player)
 	local x, y, z = GetPlayerLocation(player)
 
