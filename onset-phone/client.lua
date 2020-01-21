@@ -13,9 +13,9 @@ local phoneHome
 local phoneContacts
 
 AddEvent("OnKeyPress", function(key)
-    if key == "K" and not phoneOpened and not GetPlayerBusy() then
+    if key == PHONE_OPEN_KEY and not phoneOpened and not GetPlayerBusy() then
         OpenPhone()
-    elseif key == "Escape" and phoneOpened then
+    elseif key == PHONE_CLOSE_KEY and phoneOpened then
         ClosePhone()
     end
 end)
