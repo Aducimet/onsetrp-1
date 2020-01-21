@@ -8,7 +8,13 @@ end)
 
 function itemUsedInInventory(event)
     local data = json_decode(event)
-    CallRemoteEvent("UseInventory", data.idItem, 1)
+    local vehicle = GetPlayerVehicle()
+
+    if vehicle ~= 0 then
+        CallRemoteEvent("UseInventory", data.idItem, 1, true, GetVehicleForwardSpeed(vehicle))
+    else
+        CallRemoteEvent("UseInventory", data.idItem, 1, false)
+    end
 end
 AddEvent('BURDIGALAX_inventory_onUse', itemUsedInInventory)
 
@@ -28,7 +34,7 @@ AddEvent('BURDIGALAX_inventory_onTransfer', itemTransferedInInventory)
 AddEvent("OnKeyPress", function( key )
     local cuffed = GetPlayerPropertyValue(GetPlayerId(), "cuffed") or false
         
-    if key == "F4" and not alreadyInteracting and not cuffed then
+    if key == "F4" and not GetPlayerBusy() and not cuffed then
         local vehicle = GetPlayerVehicle()
 
         if vehicle ~= 0 then

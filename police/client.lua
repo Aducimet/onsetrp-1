@@ -31,34 +31,34 @@ AddEvent("OnTranslationReady", function()
 end)
 
 AddEvent("OnKeyPress", function( key )
-    if key == "E" and not alreadyInteracting then
+    if key == "E" and not GetPlayerBusy() then
 	local NearestPolice, purpose = GetNearestPolice()
 	if NearestPolice ~= 0 then
 	    if(purpose == "police_job") then
 		--Dialog.show(policeNpcMenu)
 		local message = (isOnDuty and _("police_npc_message_stop") or _("police_npc_message_start"))
-		startCinematic({
-            title = _("police_npc_name"),
-            message = message,
-            actions = {
-                {
-                    text = _("yes"),
-                    callback = "StartStopService"
-                },
-                {
-                    text = _("no"),
-                    callback = "CUIGoodbye",
-                }
-            }
-        }, NearestPolice, "SALUTE")
+			startCinematic({
+				title = _("police_npc_name"),
+				message = message,
+				actions = {
+					{
+						text = _("yes"),
+						callback = "StartStopService"
+					},
+					{
+						text = _("no"),
+						callback = "CUIGoodbye",
+					}
+				}
+			}, NearestPolice, "SALUTE")
 	    elseif(purpose == "police_garage") then
-		Dialog.show(policeNpcGarageMenu)
+			Dialog.show(policeNpcGarageMenu)
 	    elseif(purpose == "police_armory") then
-		Dialog.show(policeNpcArmoryMenu)
+			Dialog.show(policeNpcArmoryMenu)
 	    end
 	end
     end
-    if key == "F3" and not alreadyInteracting then
+    if key == "F3" and not GetPlayerBusy() then
         CallRemoteEvent("OpenPoliceMenu")
     end
 end)
@@ -84,7 +84,7 @@ end)
 
 AddRemoteEvent("PoliceAlert", function(alert)
 	if isOnDuty then
-		MakeNotification(alert)
+		MakeErrorNotification(alert)
 	end
 end)
 

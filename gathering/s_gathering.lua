@@ -101,6 +101,30 @@ gatherTable = {
             {model = 1160, x = -215479, y = -50969, z = 107, rx = 0, ry = 0, rz = 0},
         }
     },
+    {
+        gather_zone = {x = 232464, y = 193521, z = 112},
+        gather_item = "fish",
+        gather_tool = "fishing_rod",
+        gather_animation = "FISHING",
+        gather_animation_attachement = {modelid = 1111, bone = "hand_r"},
+    },
+    {
+        gather_zone = {x = -96934, y = 7598, z = 2131},
+        gather_item = "unprocessed_rock",
+        gather_tool = "pickaxe",
+        gather_animation = "PICKAXE_SWING",
+        gather_animation_attachement = {modelid = 1063, bone = "hand_r"},
+        process_steps = {
+            {
+                step_zone = {x = -82629, y = 90991, z = 481},
+                step_require = "unprocessed_rock",
+                step_require_number = 1,
+                step_processed_item = "processed_rock",
+                step_processed_item_number = 1,
+                step_process_time = 15,
+            }
+        }
+    }
 }
 
 gatherPickupsCached = {}
@@ -149,8 +173,7 @@ AddEvent("OnPlayerDeath", function(player)
 end)
 
 function GatheringCleanPlayerActions(player)-- Clean timers and actions for a player
-    PlayerData[player].onAction = false
-    PlayerData[player].isActioned = false
+    SetPlayerNotBusy(player)
     if PlayerData[player].timerProcessing ~= nil then
         DestroyTimer(PlayerData[player].timerProcessing)-- for anim loop
         PlayerData[player].timerProcessing = nil
@@ -167,8 +190,7 @@ AddRemoteEvent("gathering:gather:start", function(player, gatherPickup)-- Start 
     local gather = GetGatherByGatherPickup(gatherPickup)
     if gatherTable[gather] == nil then return end -- fail check
     
-    if PlayerData[player].onAction == true then -- Stop gathering
-        PlayerData[player].onAction = false
+    if GetPlayerBusy(player) then -- Stop gathering
         StopGathering(player, gather)
         CallRemoteEvent(player, "MakeNotification", _("gather_cancelled"), "linear-gradient(to right, #ff5f6d, #ffc371)")
         return
@@ -191,7 +213,7 @@ AddRemoteEvent("gathering:gather:start", function(player, gatherPickup)-- Start 
         SetAttachedItem(player, gatherTable[gather].gather_animation_attachement.bone, gatherTable[gather].gather_animation_attachement.modelid)
     end
     
-    PlayerData[player].onAction = true
+    SetPlayerBusy(player)
     PlayerData[player].isGathering = gather
     PlayerData[player].gatheringAntiGlitch = math.random(0, 100)
     DoGathering(player, gather, PlayerData[player].gatheringAntiGlitch)
@@ -200,8 +222,6 @@ end)
 function DoGathering(player, gather, antiglitchKey)
     -- #4 Lock and prepare player
     CallRemoteEvent(player, "LockControlMove", true)
-    PlayerData[player].isActioned = true
-    PlayerData[player].onAction = true
     
     -- #5 Start animation and loop
     SetPlayerAnimation(player, gatherTable[gather].gather_animation or defaultAnimationGather)
@@ -216,7 +236,7 @@ function DoGathering(player, gather, antiglitchKey)
     -- #7 When job is done, add to inventory and loop
     if PlayerData[player].isGathering == gather and PlayerData[player].gatheringAntiGlitch == antiglitchKey then
         Delay((gatherTable[gather].gather_time or defaultGatherTime) * 1000, function()
-            if PlayerData[player].isActioned and PlayerData[player].onAction and PlayerData[player].isGathering == gather and PlayerData[player].gatheringAntiGlitch == antiglitchKey then -- Check if the player didnt canceled the job
+            if GetPlayerBusy(player) and PlayerData[player].isGathering == gather and PlayerData[player].gatheringAntiGlitch == antiglitchKey then -- Check if the player didnt canceled the job
                 if AddInventory(player, gatherTable[gather].gather_item, 1) == true then
                     CallRemoteEvent(player, "MakeNotification", _("gather_success", _(gatherTable[gather].gather_item)), "linear-gradient(to right, #00b09b, #96c93d)")
                     DoGathering(player, gather, antiglitchKey)
@@ -230,8 +250,7 @@ function DoGathering(player, gather, antiglitchKey)
 end
 
 function StopGathering(player, gather)
-    PlayerData[player].isActioned = false
-    PlayerData[player].onAction = false
+    SetPlayerNotBusy(player)
     PlayerData[player].isGathering = nil
     if PlayerData[player].timerGathering ~= nil then DestroyTimer(PlayerData[player].timerGathering) end -- for anim loop
     PlayerData[player].timerGathering = nil
@@ -249,8 +268,8 @@ AddRemoteEvent("gathering:process:start", function(player, processPickup)
     
     local process = gatherTable[gather[1]].process_steps[gather[2]]
     
-    if PlayerData[player].onAction == true then -- Stop processing
-        PlayerData[player].onAction = false
+    if GetPlayerBusy(player) then -- Stop processing
+        SetPlayerNotBusy(player)
         StopProcessing(player, gather, process)
         CallRemoteEvent(player, "MakeNotification", _("process_cancel", process.step_require_number, _(process.step_require)), "linear-gradient(to right, #ff5f6d, #ffc371)")
         return
@@ -273,7 +292,7 @@ AddRemoteEvent("gathering:process:start", function(player, processPickup)
         SetAttachedItem(player, process.step_animation_attachement.bone, process.step_animation_attachement.modelid)
     end
     
-    PlayerData[player].onAction = true
+    SetPlayerBusy(player)
     PlayerData[player].isProcessing = gather[2]
     PlayerData[player].gatheringAntiGlitch = math.random(0, 100)
     DoProcessing(player, gatherTable[gather[1]], process, gather[2], PlayerData[player].gatheringAntiGlitch)
@@ -296,15 +315,13 @@ function DoProcessing(player, gather, process, processKey, antiglitchKey)
     end
     if gather.require_knowledge == true and canProcess == 0 then
         CallRemoteEvent(player, "MakeNotification", _("drugdealer_noknowledgeforthis"), "linear-gradient(to right, #ff5f6d, #ffc371)")
-        PlayerData[player].isActioned = false
-        PlayerData[player].onAction = false
+        SetPlayerNotBusy(player)
         return
     end
     
     -- #5 Lock and prepare player
     CallRemoteEvent(player, "LockControlMove", true)
-    PlayerData[player].isActioned = true
-    PlayerData[player].onAction = true
+    SetPlayerBusy(player)
     
     -- #6 Start animation and loop
     SetPlayerAnimation(player, process.step_animation or defaultAnimationProcess)
@@ -318,7 +335,7 @@ function DoProcessing(player, gather, process, processKey, antiglitchKey)
     -- #8 When job is done, add to inventory and loop
     if PlayerData[player].isProcessing == processKey and RemoveInventory(player, process.step_require, process.step_require_number) and PlayerData[player].gatheringAntiGlitch == antiglitchKey then
         Delay(process.step_process_time * 1000, function()
-            if PlayerData[player].isActioned and PlayerData[player].onAction and PlayerData[player].isProcessing == processKey and PlayerData[player].gatheringAntiGlitch == antiglitchKey then -- Check if the player didnt canceled the job
+            if GetPlayerBusy(player) and PlayerData[player].isProcessing == processKey and PlayerData[player].gatheringAntiGlitch == antiglitchKey then -- Check if the player didnt canceled the job
                 if AddInventory(player, process.step_processed_item, process.step_processed_item_number) == true then
                     CallRemoteEvent(player, "MakeNotification", _("process_success", process.step_processed_item_number, _(process.step_processed_item)), "linear-gradient(to right, #00b09b, #96c93d)")
                     DoProcessing(player, gather, process, processKey, antiglitchKey)
@@ -335,8 +352,7 @@ function DoProcessing(player, gather, process, processKey, antiglitchKey)
 end
 
 function StopProcessing(player, gather, process)
-    PlayerData[player].isActioned = false
-    PlayerData[player].onAction = false
+    SetPlayerNotBusy(player)
     PlayerData[player].isProcessing = nil
     if PlayerData[player].timerProcessing ~= nil then DestroyTimer(PlayerData[player].timerProcessing) end -- for anim loop
     PlayerData[player].timerProcessing = nil
