@@ -89,6 +89,9 @@ function ChangeOtherPlayerClothes(player, otherplayer)
     if PlayerData[otherplayer].clothing[1] == nil then
         return
     end
+    
+    CallRemoteEvent(otherplayer, "ClientChangeClothing", player, 6, "noShoesLegsTorso")
+
     if PlayerData[otherplayer].job == "medic" then
         playerhairscolor = getHairsColor(PlayerData[otherplayer].clothing[2])
         CallRemoteEvent(player, "ClientChangeClothing", otherplayer, 0, PlayerData[player].clothing[1], playerhairscolor[1], playerhairscolor[2], playerhairscolor[3], playerhairscolor[4])
@@ -111,6 +114,8 @@ end
 AddRemoteEvent("ServerChangeOtherPlayerClothes", ChangeOtherPlayerClothes)
 
 function UpdateClothes(player)
+    CallRemoteEvent(player, "ClientChangeClothing", player, 6, "noShoesLegsTorso")
+
     if PlayerData[player].job == "medic" then
         CallRemoteEvent(player, "ClientChangeClothing", player, 0, PlayerData[player].clothing[1], playerhairscolor[1], playerhairscolor[2], playerhairscolor[3], playerhairscolor[4])
         CallRemoteEvent(player, "ClientChangeClothing", player, 1, "/Game/CharacterModels/SkeletalMesh/Outfits/HZN_Outfit_Set_Scientist_LPR", 0, 0, 0, 0)
@@ -192,4 +197,25 @@ function getShirtsModel(shirts)
             return v
         end
     end
+end
+
+function GetClosePlayers(player, distance, blacklistedJob)
+    local playerIds = { }
+	local x, y, z = GetPlayerLocation(player)
+    
+    for playerId, v in pairs(GetStreamedPlayersForPlayer(player)) do
+        local _x, _y, _z = GetPlayerLocation(playerId)
+
+        if PlayerHaveName(playerId) and playerId ~= player and GetDistance3D(x, y, z, _x, _y, _z) < distance then
+            if blacklistedJob == nil or PlayerData[playerId].job ~= blacklistedJob then
+                playerIds[playerId] = PlayerData[playerId].name
+            end
+        end
+    end
+
+    return playerIds
+end
+
+function PlayerHaveName(player)
+	return PlayerData[player] ~= nil and PlayerData[player].name ~= nil and PlayerData[player].steamname ~= nil
 end

@@ -385,7 +385,12 @@ function GetGatherByProcessPickup(processPickup)
 end
 
 -- DEV MODE
-AddCommand("job", function(player, job)
-    PlayerData[player].job = job
-    AddPlayerChat(player, "Vous êtes maintenant un " .. _(job))
+AddCommand("lumberjack", function(player)
+    PlayerData[player].job = "lumberjack"
+    AddPlayerChat(player, "Vous êtes maintenant un bûcheron")
+end)
+
+AddCommand("leavejob", function(player)
+    PlayerData[player].job = ""
+    AddPlayerChat(player, "Vous n'avez plus de travail")
 end)
